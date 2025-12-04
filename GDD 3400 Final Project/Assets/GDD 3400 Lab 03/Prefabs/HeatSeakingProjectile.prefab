@@ -9,14 +9,14 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 206512972777243887}
-  - component: {fileID: 7849582968535974138}
   - component: {fileID: 8927449034244532884}
   - component: {fileID: 4273089762497034565}
   - component: {fileID: 1448105094136558580}
   - component: {fileID: 4189405114836604576}
+  - component: {fileID: 1252428361466640345}
   m_Layer: 0
-  m_Name: Projectile
-  m_TagString: Projectile
+  m_Name: HeatSeakingProjectile
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -36,28 +36,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7849582968535974138
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8983293445293081017}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a609c4fac40d94de9aa5447b425eb41e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _Speed: 5
-  _InitialColliderDelay: 0.2
-  _LifeTime: 10
-  _Damage: 100
-  _ApplyExplosionForce: 1
-  _ImpactRadius: 2
-  _ImpactForce: 4
-  _UpwardsModifier: 0.5
-  _Collider: {fileID: 1448105094136558580}
-  _ImpactParticles: {fileID: 5087598926906689077, guid: 67112235f981e4ce19050e88f3d9457b, type: 3}
 --- !u!33 &8927449034244532884
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -89,7 +67,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 12ac5e6140cfc4b46813ed7b2844da0a, type: 2}
+  - {fileID: 2100000, guid: a89a4dc8e810202439b0fa9eeb340097, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -159,3 +137,26 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 3
+--- !u!114 &1252428361466640345
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8983293445293081017}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5cd60218646f9234f90b697070768789, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _Speed: 12
+  _InitialColliderDelay: 0.2
+  _RotationSpeed: 5
+  _LifeTime: 10
+  _Damage: 100
+  _ApplyExplosionForce: 1
+  _ImpactRadius: 2
+  _ImpactForce: 4
+  _UpwardsModifier: 0.5
+  _Collider: {fileID: 1448105094136558580}
+  _ImpactParticles: {fileID: 5087598926906689077, guid: 67112235f981e4ce19050e88f3d9457b, type: 3}
