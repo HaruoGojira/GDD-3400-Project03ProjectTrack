@@ -5,7 +5,7 @@ public class HeatSeakingProjectile : MonoBehaviour
     //variables for the projectile
     [SerializeField] float _Speed = 12f;
     [SerializeField] float _InitialColliderDelay = 0.2f; // This is the delay before the collider is enabled
-    [SerializeField] float _RotationSpeed = 5f;
+    [SerializeField] float _RotationSpeed = 6f;
     [SerializeField] float _LifeTime = 10f;
     [SerializeField] int _Damage = 100;
 
@@ -38,9 +38,12 @@ public class HeatSeakingProjectile : MonoBehaviour
         _parentTag = parentTag;
         //finds the target with the "Player" tag
         _target = GameObject.FindGameObjectWithTag("Player").transform;
-        // Set the direction of the projectile and add force to it
-        this.transform.forward = direction;
-        _rb.AddForce(direction * _Speed, ForceMode.Impulse);
+        // aims at the player's position
+        Vector3 _initialDirection = (_target.position - this.transform.position).normalized;
+        this.transform.rotation = Quaternion.LookRotation(_initialDirection);
+
+        // Set the initial velocity
+        _rb.velocity = _initialDirection * _Speed;
 
         // Enable the collider after the initial delay
         Invoke("EnableCollider", _InitialColliderDelay);
@@ -75,7 +78,10 @@ public class HeatSeakingProjectile : MonoBehaviour
         }
     }
 
-
+    /// <summary>
+    /// this function is called when the projectile collides with another collider
+    /// </summary>
+    /// <param name="other"></param>
     void OnTriggerEnter(Collider other)
     {
         // If the projectile hits the parent, don't do anything
@@ -84,7 +90,10 @@ public class HeatSeakingProjectile : MonoBehaviour
         //breaks objects with the "Breakable" tag
         if (other.gameObject.tag == "Breakable")
         {
+            // Send a message to break the object
             other.gameObject.SendMessageUpwards("BreakObject", SendMessageOptions.DontRequireReceiver);
+            // destroys the object with the "Breakable" tag
+            Destroy(other.gameObject);
         }
 
         // If the projectile hits something else, play the impact particles and destroy the projectile
@@ -104,6 +113,10 @@ public class HeatSeakingProjectile : MonoBehaviour
         DestroyProjectile();
     }
 
+    /// <summary>
+    /// this function applies explosion force to nearby rigidbodies
+    /// </summary>
+    /// <param name="explosionPosition"></param>
     public void Explode(Vector3 explosionPosition)
     {
         // Find nearby colliders
