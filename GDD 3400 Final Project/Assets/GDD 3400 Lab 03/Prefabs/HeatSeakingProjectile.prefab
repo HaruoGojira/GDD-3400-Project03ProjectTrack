@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 1252428361466640345}
   m_Layer: 0
   m_Name: HeatSeakingProjectile
-  m_TagString: Untagged
+  m_TagString: Projectile
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -149,7 +149,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5cd60218646f9234f90b697070768789, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _Speed: 12
+  _Speed: 4
   _InitialColliderDelay: 0.2
   _RotationSpeed: 5
   _LifeTime: 10

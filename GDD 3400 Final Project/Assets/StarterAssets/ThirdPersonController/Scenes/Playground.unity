@@ -1570,7 +1570,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -0.16667175}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 10}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &983993319
@@ -1733,6 +1733,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 854550586389824841, guid: 4eba03c9a61ca214c9ddcb6ad8cde9c4, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 912277717126724884, guid: 4eba03c9a61ca214c9ddcb6ad8cde9c4, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1325566653016386217, guid: 4eba03c9a61ca214c9ddcb6ad8cde9c4, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1618699769564493338, guid: 4eba03c9a61ca214c9ddcb6ad8cde9c4, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3584784208440225709, guid: 4eba03c9a61ca214c9ddcb6ad8cde9c4, type: 3}
       propertyPath: m_LocalScale.x
       value: 12.130001
@@ -1788,6 +1804,18 @@ PrefabInstance:
     - target: {fileID: 4880318927624165521, guid: 4eba03c9a61ca214c9ddcb6ad8cde9c4, type: 3}
       propertyPath: m_Name
       value: Big Enemy
+      objectReference: {fileID: 0}
+    - target: {fileID: 4880318927624165521, guid: 4eba03c9a61ca214c9ddcb6ad8cde9c4, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5204077969207014250, guid: 4eba03c9a61ca214c9ddcb6ad8cde9c4, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6743567969334658126, guid: 4eba03c9a61ca214c9ddcb6ad8cde9c4, type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3177,7 +3205,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8345070700331616360, guid: 09aade0ecefd01e4b8f7661acf64f5c2, type: 3}
       propertyPath: m_LocalScale.x
-      value: 3
+      value: 3.3435001
       objectReference: {fileID: 0}
     - target: {fileID: 8345070700331616360, guid: 09aade0ecefd01e4b8f7661acf64f5c2, type: 3}
       propertyPath: m_LocalScale.z
@@ -4712,6 +4740,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 912277717126724884, guid: bb669b6185d6e34448a61e47e0d47b05, type: 3}
+      propertyPath: _heatSeakingAttackTimer
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 3584784208440225709, guid: bb669b6185d6e34448a61e47e0d47b05, type: 3}
       propertyPath: m_LocalPosition.x
       value: 10.74

@@ -75,7 +75,6 @@ public class AISmallEnemy : MonoBehaviour
         SwitchState(AIState.Idle);
     }
 
-
     /// <summary>
     /// Update is called once per frame.
     /// </summary>
@@ -348,6 +347,7 @@ public class AISmallEnemy : MonoBehaviour
         GameObject _heatSeakingProjectile = Instantiate(_HeatSeakingProjectilePrefab, _shootMechanic.ShootPoint.position, Quaternion.identity);
         // This will make sure the projectile doesn't kill the enemy that shot it
         Vector3 _directionToPlayer = (_perception.GetPlayerCenterPosition() - _shootMechanic.ShootPoint.position).normalized;
+        Debug.DrawLine(_shootMechanic.ShootPoint.position, _perception.GetPlayerCenterPosition(), Color.red, 5f);
         _heatSeakingProjectile.GetComponent<HeatSeakingProjectile>().InitializeProjectile(_directionToPlayer, this.gameObject.tag);
 
     }

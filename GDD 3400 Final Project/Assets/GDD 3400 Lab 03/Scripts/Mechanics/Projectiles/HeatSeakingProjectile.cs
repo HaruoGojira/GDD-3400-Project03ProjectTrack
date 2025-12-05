@@ -38,12 +38,17 @@ public class HeatSeakingProjectile : MonoBehaviour
         _parentTag = parentTag;
         //finds the target with the "Player" tag
         _target = GameObject.FindGameObjectWithTag("Player").transform;
-        // aims at the player's position
-        Vector3 _initialDirection = (_target.position - this.transform.position).normalized;
-        this.transform.rotation = Quaternion.LookRotation(_initialDirection);
 
-        // Set the initial velocity
-        _rb.velocity = _initialDirection * _Speed;
+        // aims at the player's position
+        //Vector3 _initialDirection = (_target.position - this.transform.position).normalized;
+        //this.transform.rotation = Quaternion.LookRotation(_initialDirection);
+
+        //// Set the initial velocity
+        //_rb.velocity = _initialDirection * _Speed;
+
+        // Set the direction of the projectile and add force to it
+        this.transform.forward = direction;
+        this.GetComponent<Rigidbody>().AddForce(direction * _Speed, ForceMode.Impulse);
 
         // Enable the collider after the initial delay
         Invoke("EnableCollider", _InitialColliderDelay);
@@ -66,15 +71,19 @@ public class HeatSeakingProjectile : MonoBehaviour
         // If there is a target, rotate towards it
         if (_target != null)
         {
+            Debug.Log("HEat Seaking", _target.gameObject);
             // Calculate the direction to the target
-            Vector3 directionToTarget = (_target.position - this.transform.position).normalized;
+            Vector3 directionToTarget = ((_target.position + Vector3.up) - this.transform.position).normalized;
+            transform.forward = directionToTarget;
+            _rb.linearVelocity = this.transform.forward * _Speed;
+
             // Calculate the rotation step
-            float step = _RotationSpeed * Time.deltaTime;
-            // Rotate the projectile towards the target
-            Vector3 newDirection = Vector3.RotateTowards(this.transform.forward, directionToTarget, step, 0.0f);
-            this.transform.rotation = Quaternion.LookRotation(newDirection);
+            //float step = _RotationSpeed * Time.deltaTime;
+            //// Rotate the projectile towards the target
+            //Vector3 newDirection = Vector3.RotateTowards(this.transform.forward, directionToTarget, step, 0.0f);
+            //this.transform.rotation = Quaternion.LookRotation(newDirection);
             // Update the velocity to match the new forward direction
-            _rb.velocity = this.transform.forward * _Speed;
+            //_rb.velocity = this.transform.forward * _Speed;
         }
     }
 
@@ -85,7 +94,7 @@ public class HeatSeakingProjectile : MonoBehaviour
     void OnTriggerEnter(Collider other)
     {
         // If the projectile hits the parent, don't do anything
-        if (other.gameObject.tag == _parentTag) return;
+        if (other.gameObject.tag == _parentTag || other.gameObject.tag == "Projectile") return;
 
         //breaks objects with the "Breakable" tag
         if (other.gameObject.tag == "Breakable")
