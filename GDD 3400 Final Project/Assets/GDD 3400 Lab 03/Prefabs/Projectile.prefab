@@ -48,10 +48,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a609c4fac40d94de9aa5447b425eb41e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _Speed: 5
+  _Speed: 15
   _InitialColliderDelay: 0.2
   _LifeTime: 10
-  _Damage: 100
+  _Damage: 10
   _ApplyExplosionForce: 1
   _ImpactRadius: 2
   _ImpactForce: 4

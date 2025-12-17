@@ -59,9 +59,9 @@ public class ShootMechanic : MonoBehaviour
         // Check if we're on cooldown from our last shot
         if (_ShootCooldown != null) return;
 
-        // Check if the target point is within the minimum and maximum shoot range
-        float distanceToTarget = Vector3.Distance(this.transform.position, targetPoint);
-        if (distanceToTarget < _MinimumShootRange || distanceToTarget > _MaximumShootRange) return;
+        //// Check if the target point is within the minimum and maximum shoot range
+        //float distanceToTarget = Vector3.Distance(this.transform.position, targetPoint);
+        //if (distanceToTarget < _MinimumShootRange || distanceToTarget > _MaximumShootRange) return;
 
         // Set the aim target point
         _aimTargetPoint = targetPoint;
@@ -102,8 +102,14 @@ public class ShootMechanic : MonoBehaviour
     private void SpawnProjectile()
     {
         // Spawn the projectile at the shoot point and initialize it with the shooting direction and parent tag
-        Projectile projectile = Instantiate(_ProjectilePrefab, _ShootPoint.position, Quaternion.identity).GetComponent<Projectile>();
-        projectile.InitializeProjectile(_aimTargetPoint - _ShootPoint.position, this.gameObject.tag);
+        Projectile _projectile = Instantiate(_ProjectilePrefab, _ShootPoint.position, Quaternion.identity).GetComponent<Projectile>();
+
+        // ensures no distance based speed scaling
+        Vector3 _direction = (_aimTargetPoint - _ShootPoint.position).normalized;
+        //projectile.InitializeProjectile(_aimTargetPoint - _ShootPoint.position, this.gameObject.tag);
+        _projectile.InitializeProjectile(_direction, this.gameObject.tag);
+
+
     }
 
     public bool CheckCanShoot()

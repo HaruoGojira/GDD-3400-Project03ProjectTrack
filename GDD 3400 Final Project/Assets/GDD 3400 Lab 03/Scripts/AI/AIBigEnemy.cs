@@ -5,9 +5,9 @@ public class AIBigEnemy : MonoBehaviour
     public enum AIState
     {
         Idle,
-        Patrol,
         Chase,
-        Search,
+        HeatSeakingUltimate,
+        CombustUltimate
     }
 
     [Header("Health")]
@@ -16,23 +16,34 @@ public class AIBigEnemy : MonoBehaviour
     [Header("Navigation")]
     [SerializeField] float _ReNavigateInterval = 1f;
 
-    [Header("Patrol Settings")]
-    [SerializeField] private float _PatrolSpeed = 2f;
-    [SerializeField] private Transform[] _PatrolPoints;     // Possible patrol/search locations
-    [SerializeField] private float _IdleAtPatrolPointTime = 2f;
-
     [Header("Chase Settings")]
     [SerializeField] private float _ChaseSpeed = 5f;
     [SerializeField] private float _PreferredDistance = 8f;
     [SerializeField] private float _DistanceTolerance = 2f;
     [SerializeField] private float _ChaseBuffer = 1f; // The buffer time to wait before the chase state exits to the search state
 
-    [Header("Search Settings")]
-    [SerializeField] private float _TimeToRememberPlayer = 3f;
-
     [Header("Attack Settings")]
     [SerializeField] private bool _AttackOnSight = true;
-    [SerializeField] private float _InitialAttackInterval = 1f; // The time to wait before the first attack after entering the chase state
+    [SerializeField] private float _InitialAttackInterval = 3f; // The time to wait before the first attack after entering the chase state
+    float _bossAttackTimer = 0f;
+
+    [Header("Ultimate Settings")]
+    [SerializeField] float _heatSeakingAttackInterval = 5f;
+    [SerializeField] float _combustAttackInterval = 15f;
+
+    // Ultimate timers
+    float _heatSeakingAttackTimer = 0f;
+    float _combustAttackTimer = 0f;
+
+    // Prefabs for ultimates
+    [SerializeField] GameObject _heatSeakingProjectilePrefab;
+    [SerializeField] GameObject _combustProjectilePrefab;
+
+    //Combustion parameters
+    [SerializeField] int _combustProjectileCount = 50;
+    [SerializeField] float _combustSpreadAngle = 45f;
+    [SerializeField] float _combustProjectileInterval = 0.1f;
+    float _combustProjectileTimer = 0f;
 
     // Internal references
     PlayerController _player;
@@ -43,13 +54,6 @@ public class AIBigEnemy : MonoBehaviour
     // Internal state
     AIState _currentState = AIState.Idle;
     private float _stateTimer = 0f;
-    private float _chaseBuffer = 0f;
-
-    private Transform _currentPatrolPoint;
-    private Vector3 _chaseStartPosition;
-    private Vector3 _lastKnownPlayerPosition;
-
-
 
     #region Unity Lifecycle
 
@@ -65,14 +69,20 @@ public class AIBigEnemy : MonoBehaviour
         SwitchState(AIState.Idle);
     }
 
-
+    // Update is called once per frame
     private void Update()
     {
         // Update the state timer
         _stateTimer += Time.deltaTime;
 
+        // Update the attack timer
+        _bossAttackTimer += Time.deltaTime;
+        _heatSeakingAttackTimer += Time.deltaTime;
+        _combustAttackTimer += Time.deltaTime;
+
+
         // Set the name of the agent to the current state for debugging purposes
-        this.name = "AI Agent: " + _currentState;
+        this.name = "BOSS STATE: " + _currentState;
 
         // Update the state of the agent
         switch (_currentState)
@@ -81,17 +91,18 @@ public class AIBigEnemy : MonoBehaviour
                 UpdateIdle();
                 break;
 
-            case AIState.Patrol:
-                UpdatePatrol();
-                break;
-
             case AIState.Chase:
                 UpdateChase();
                 break;
 
-            case AIState.Search:
-                UpdateSearch();
+            case AIState.HeatSeakingUltimate:
+                UpdateHeatSeakingUltimate();
                 break;
+            
+            case AIState.CombustUltimate:
+                UpdateCombustUltimate();
+                break;
+
         }
     }
 
@@ -99,63 +110,22 @@ public class AIBigEnemy : MonoBehaviour
 
     #region State Updates
 
+    /// <summary>
+    /// This method switches the AI to a new state.
+    /// </summary>
+    /// <param name="newState"></param>
     private void SwitchState(AIState newState)
     {
-
-        // First call the exit state method to clean up the current state
-        OnExitState(_currentState);
-
         // Then set the new state
         _currentState = newState;
-
-        // Finally call the enter state method to initialize the new state
-        OnEnterState(newState);
-    }
-
-    // Called once when the state is entered
-    private void OnEnterState(AIState state)
-    {
         _stateTimer = 0f;
 
-        switch (state)
+        // boss attack timer reset when entering chase state
+        if (newState == AIState.Chase)
         {
-            case AIState.Idle:
-                break;
-
-            case AIState.Patrol:
-                _navigation.SetSpeed(_PatrolSpeed);
-                PickNewPatrolPoint();
-                break;
-
-            case AIState.Chase:
-                _chaseStartPosition = this.transform.position;
-                _navigation.SetSpeed(_ChaseSpeed);
-                break;
-
-            case AIState.Search:
-                _navigation.SetSpeed(_PatrolSpeed);
-                _navigation.SetDestination(_lastKnownPlayerPosition, true);
-                break;
+            _bossAttackTimer = 0f;
         }
-    }
 
-    // Called once when the state is exited
-    private void OnExitState(AIState state)
-    {
-        switch (state)
-        {
-            case AIState.Idle:
-                break;
-
-            case AIState.Patrol:
-                break;
-
-            case AIState.Chase:
-                break;
-
-            case AIState.Search:
-                break;
-        }
     }
 
     #endregion
@@ -169,43 +139,11 @@ public class AIBigEnemy : MonoBehaviour
             SwitchState(AIState.Chase);
         }
 
-        // If player is not even in detection range, start searching.
-        else
-        {
-            SwitchState(AIState.Patrol);
-        }
     }
 
-    private void UpdatePatrol()
-    {
-        // If we see the player at any time, start chasing.
-        if (_perception.CanSeePlayer)
-        {
-            SwitchState(AIState.Chase);
-            return;
-        }
-
-        // If no search points, just go back to idle.
-        if (_PatrolPoints == null || _PatrolPoints.Length == 0)
-        {
-            SwitchState(AIState.Idle);
-            return;
-        }
-
-        // Make sure we have somewhere to go.
-        if (_currentPatrolPoint == null)
-        {
-            PickNewPatrolPoint();
-        }
-
-        // If we've reached the destination, set the state timer to the idle time.
-        if (_navigation.IsAtDestination())
-        {
-            _currentPatrolPoint = null;
-            SwitchState(AIState.Idle);
-        }
-    }
-
+    /// <summary>
+    /// This method updates the chase behavior of the AI.
+    /// </summary>
     private void UpdateChase()
     {
         float distanceToPlayer = Vector3.Distance(this.transform.position, _player.transform.position);
@@ -219,7 +157,9 @@ public class AIBigEnemy : MonoBehaviour
             if (distanceToPlayer > _PreferredDistance + _DistanceTolerance)
             {
                 Debug.Log("TOO FAR, moving closer");
-                _navigation.SetDestination(Vector3.Lerp(_player.transform.position, _chaseStartPosition, 0.5f));
+                Vector3 directionToPlayer = (_player.transform.position - this.transform.position).normalized;
+                Vector3 targetPosition = _player.transform.position - directionToPlayer * _PreferredDistance;
+                _navigation.SetDestination(targetPosition);
             }
             // Too close: back away to our preferred distance.
             else if (distanceToPlayer < _PreferredDistance - _DistanceTolerance)
@@ -235,68 +175,112 @@ public class AIBigEnemy : MonoBehaviour
             else
             {
                 Debug.Log("WITHIN TARGET DISTANCE, staying still");
-                _navigation.SetDestination(this.transform.position);
             }
 
 
             // Perform the shoot action
-            if (_AttackOnSight && _stateTimer >= _InitialAttackInterval)
+            if (_AttackOnSight && _bossAttackTimer >= _InitialAttackInterval)
             {
                 _shootMechanic.PerformShoot(_perception.GetPlayerCenterPosition());
+                _bossAttackTimer = 0f; // Reset the attack timer
             }
         }
         else
         {
-            _chaseBuffer += Time.deltaTime;
-
-            // If we have been chasing for too long, start searching.
-            if (_chaseBuffer >= _ChaseBuffer)
-            {
-                _lastKnownPlayerPosition = _player.transform.position;
-                _chaseBuffer = 0f;
-
-                SwitchState(AIState.Search);
-            }
+           // boss doesn't engage
+           _navigation.SetDestination(this.transform.position);
         }
+
+        // Check for ultimate conditions
+        if (_heatSeakingAttackTimer >= _heatSeakingAttackInterval)
+        {
+            SwitchState(AIState.HeatSeakingUltimate);
+            return;
+        }
+        else if (_combustAttackTimer >= _combustAttackInterval)
+        {
+            SwitchState(AIState.CombustUltimate);
+            return;
+        }
+
     }
 
-    private void UpdateSearch()
+    /// <summary>
+    /// Heat-Seaking Ultimate State Update
+    /// </summary>
+    void UpdateHeatSeakingUltimate()
     {
-        // If we have been searching for too long, go back to patrol.
-        if (_stateTimer >= _TimeToRememberPlayer)
-        {
-            // Move to last known location.
-            _navigation.SetDestination(_lastKnownPlayerPosition);
+        // Timer for player to react
+        if (_stateTimer < 1f)
+            return;
 
-            // Once we arrive and still can't see them, go back to search.
-            if (_navigation.IsAtDestination())
+        // Switches to heat-seaking attack
+        GameObject projectile = Instantiate(_heatSeakingProjectilePrefab, _shootMechanic.ShootPoint.position, Quaternion.identity);
+
+        // Initialize the projectile to home in on the player
+        Vector3 directionToPlayer = (_player.transform.position - _shootMechanic.ShootPoint.position).normalized;
+        projectile.GetComponent<HeatSeakingProjectile>().InitializeProjectile(directionToPlayer, this.tag);
+
+        // Reset the timer and switch back to chase state
+        _heatSeakingAttackTimer = 0f;
+        SwitchState(AIState.Chase);
+
+    }
+
+    /// <summary>
+    /// Combust Ultimate State Update
+    /// </summary>
+    void UpdateCombustUltimate()
+    {
+       //Timer for player to react
+        if (_stateTimer < 1f)
+            return;
+
+        //timer for projectile interval
+        _combustProjectileTimer += Time.deltaTime;
+
+        // Launches combust projectiles after the timer
+        if (_combustProjectileTimer > _combustProjectileInterval)
+        {
+            //Aims at the player position
+            Vector3 _directionToPlayer = (_player.transform.position - _shootMechanic.ShootPoint.position).normalized;
+            this.transform.rotation = Quaternion.LookRotation(_directionToPlayer);
+
+            // Launches all combust projectiles in a spread pattern
+            for (int i = 0; i < _combustProjectileCount; i++)
             {
-                SwitchState(AIState.Patrol);
+                // Calculate spread angle for each projectile
+                float _angle = -_combustSpreadAngle / 2 + (_combustSpreadAngle / (_combustProjectileCount - 1)) * i;
+                Quaternion _rotation = Quaternion.AngleAxis(_angle, Vector3.up);
+                Vector3 _spreadDirection = _rotation * _directionToPlayer;
+
+                //Offset the projectile spawn position slightly to avoid overlap
+                Vector3 _spawnPosition = _shootMechanic.ShootPoint.position;
+                _spawnPosition.y += Random.Range(- 2.5f, 2.5f);
+
+                // Instantiate and initialize projectile
+                GameObject _projectile = Instantiate(_combustProjectilePrefab, _spawnPosition, Quaternion.identity);
+                _projectile.GetComponent<Projectile>().InitializeProjectile(_spreadDirection, this.tag);
             }
+
+            // Reset the projectile timer
+            _combustProjectileTimer = 0f;
         }
 
-        // If we can see the player again, start chasing.
-        if (_perception.CanSeePlayer)
+        // Reset the timer and switch back to chase state
+        if (_stateTimer >= 2f)
         {
+            _combustAttackTimer = 0f;
             SwitchState(AIState.Chase);
         }
     }
 
     #endregion
 
-    private void PickNewPatrolPoint()
-    {
-        if (_PatrolPoints == null || _PatrolPoints.Length == 0)
-        {
-            return;
-        }
-
-        int index = Random.Range(0, _PatrolPoints.Length);
-        _currentPatrolPoint = _PatrolPoints[index];
-
-        _navigation.SetDestination(_currentPatrolPoint.position);
-    }
-
+    /// <summary>
+    /// If the enemy takes damage, reduce health and check for death.
+    /// </summary>
+    /// <param name="damage"></param>
     public void TakeDamage(int damage)
     {
         _Health -= damage;

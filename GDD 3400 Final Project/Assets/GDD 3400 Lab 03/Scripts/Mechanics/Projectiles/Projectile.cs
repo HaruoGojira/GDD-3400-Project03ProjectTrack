@@ -5,7 +5,7 @@ public class Projectile : MonoBehaviour
     [SerializeField] float _Speed = 10f;
     [SerializeField] float _InitialColliderDelay = 0.2f; // This is the delay before the collider is enabled
     [SerializeField] float _LifeTime = 10f;
-    [SerializeField] int _Damage = 100;
+    [SerializeField] int _Damage = 10;
 
     [Header("Explosion Settings")]
     [SerializeField] bool _ApplyExplosionForce = false;
@@ -46,6 +46,9 @@ public class Projectile : MonoBehaviour
     {
         // If the projectile hits the parent, don't do anything
         if (other.gameObject.tag == _parentTag) return;
+
+        // If the projectile hits another projectile, don't do anything
+        if (other.CompareTag("Projectile")) return;
 
         // If the projectile hits something else, play the impact particles and destroy the projectile
         if (_ImpactParticles != null)

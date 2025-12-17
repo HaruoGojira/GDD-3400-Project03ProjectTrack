@@ -112,8 +112,15 @@ public class AIPerception : MonoBehaviour
 
     public Vector3 GetPlayerCenterPosition()
     {
-        // By default, the player center is one unit above the player root, this can be changed 
-        return _player.transform.position + Vector3.up;
+        //vision to help for tall boss
+        CapsuleCollider _playerCollider = _player.GetComponent<CapsuleCollider>();
+        if (_playerCollider != null)
+        {
+            return _playerCollider.bounds.center;
+        }
+
+         // By default, the player center is one unit above the player root, this can be changed 
+         return _player.transform.position + Vector3.up;
     }
 
 #if UNITY_EDITOR
