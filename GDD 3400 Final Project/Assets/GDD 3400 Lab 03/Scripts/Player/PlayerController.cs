@@ -10,20 +10,35 @@ public class PlayerController : MonoBehaviour
     [SerializeField] ShootMechanic _ShootMechanic;
 
     [Header("Health")]
-    [SerializeField] private int _MaxHealth = 100;
-    [SerializeField] private float _invincibilityTime = 0.2f;
+    [SerializeField] private int _PlayerHealth = 100;
+    [SerializeField] private float _invincibilityTime = 1f;
+    [SerializeField] private Healthbar _healthbar;
+    private int _maxHealth;
 
     // varibles for health and death
     private int _currentHealth;
     private bool _IsDead = false;
     private float _invincibilityTimer = 0f;
 
+    /// <summary>
+    /// Awake is called when the script instance is being loaded
+    /// </summary>
     public void Awake()
     {
         // Initialize health
-        _currentHealth = _MaxHealth;
+        _currentHealth = _PlayerHealth;
+        _maxHealth = _PlayerHealth;
+
+        // Initialize healthbar
+        if (_healthbar != null)
+        {
+            _healthbar.Initialize(_maxHealth);
+            _healthbar.SetHealth(_currentHealth);
+        }
+
     }
 
+    // Update is called once per frame
     public void Update()
     {
         if (_ThirdPersonAim == null || _ShootMechanic == null) return;
@@ -43,6 +58,10 @@ public class PlayerController : MonoBehaviour
         // check for death
         if (_IsDead) return;
     }
+
+    /// <summary>
+    ///  Player performs shoot action
+    /// </summary>
     private void PerformShoot()
     {
         // Perform the shoot action
@@ -53,6 +72,10 @@ public class PlayerController : MonoBehaviour
         this.transform.rotation = Quaternion.Euler(0, this.transform.rotation.eulerAngles.y, 0);
     }
 
+    /// <summary>
+    /// Player takes damage
+    /// </summary>
+    /// <param name="damage"></param>
     public void TakeDamage(int damage)
     {
         // Handle player taking damage
@@ -62,9 +85,15 @@ public class PlayerController : MonoBehaviour
         if (_IsDead) return;
         if (_invincibilityTimer > 0) return;
 
-        // Reduce health
+        // Reduce health and set invincibility timer
         _currentHealth -= damage;
         _invincibilityTimer = _invincibilityTime;
+
+        // Update healthbar
+        if (_healthbar != null)
+        {
+            _healthbar.SetHealth(_currentHealth);
+        }
 
         Debug.Log("Player health: " + _currentHealth);
 
@@ -77,7 +106,36 @@ public class PlayerController : MonoBehaviour
 
     }
 
-    //private void Die()
+    /// <summary>
+    /// This handles the player picking up health packs
+    /// </summary>
+    /// <param name="healAmount"></param>
+    public void Heal(int healAmount)
+    {
+        // Handle player healing
+        Debug.Log("Player healed: " + healAmount);
+
+        if (_IsDead) return;
+        // Increase health
+        _currentHealth += healAmount;
+
+        if (_currentHealth > _maxHealth)
+        {
+            _currentHealth = _maxHealth;
+        }
+
+        // Update healthbar
+        if (_healthbar != null)
+        {
+            _healthbar.SetHealth(_currentHealth);
+        }
+
+        Debug.Log("Player health: " + _currentHealth);
+    }
+
+    /// <summary>
+    /// This handles player death
+    /// </summary>
     private void Die()
     {
         // Handle player death
@@ -91,7 +149,11 @@ public class PlayerController : MonoBehaviour
         StartCoroutine(RestartLevelAfterDelay(2f));
     }
 
-    // This restarts the level
+    /// <summary>
+    /// This restarts the level after a delay, so the player can see that they have died
+    /// </summary>
+    /// <param name="delay"></param>
+    /// <returns></returns>
     private IEnumerator RestartLevelAfterDelay(float delay)
     {
         yield return new WaitForSeconds(delay);

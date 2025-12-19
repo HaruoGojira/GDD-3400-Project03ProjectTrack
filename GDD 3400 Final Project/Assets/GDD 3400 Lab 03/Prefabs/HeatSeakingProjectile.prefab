@@ -149,11 +149,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5cd60218646f9234f90b697070768789, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _Speed: 4
+  _Speed: 3
   _InitialColliderDelay: 0.2
   _RotationSpeed: 5
   _LifeTime: 10
-  _Damage: 100
+  _Damage: 10
   _ApplyExplosionForce: 1
   _ImpactRadius: 2
   _ImpactForce: 4

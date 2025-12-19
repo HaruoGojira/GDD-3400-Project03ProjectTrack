@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class AIBigEnemy : MonoBehaviour
 {
+    // Enum for AI States
     public enum AIState
     {
         Idle,
@@ -12,6 +13,8 @@ public class AIBigEnemy : MonoBehaviour
 
     [Header("Health")]
     [SerializeField] int _Health = 500;
+    [SerializeField] private Healthbar _healthbar; 
+    private int _maxHealth;
 
     [Header("Navigation")]
     [SerializeField] float _ReNavigateInterval = 1f;
@@ -57,6 +60,9 @@ public class AIBigEnemy : MonoBehaviour
 
     #region Unity Lifecycle
 
+    /// <summary>
+    /// The Awake method is called when the script instance is being loaded
+    /// </summary>
     private void Awake()
     {
         // Find the player, navigation, shoot mechanic, and perception components
@@ -64,6 +70,14 @@ public class AIBigEnemy : MonoBehaviour
         _navigation = this.GetComponent<AINavigation>();
         _shootMechanic = this.GetComponent<ShootMechanic>();
         _perception = this.GetComponent<AIPerception>();
+
+        // Initialize healthbar
+        _maxHealth = _Health;
+
+        if (_healthbar != null)
+        {
+            _healthbar.Initialize(_maxHealth);
+        }
 
         // Start the agent in the idle state
         SwitchState(AIState.Idle);
@@ -131,6 +145,10 @@ public class AIBigEnemy : MonoBehaviour
     #endregion
 
     #region State Updates
+
+    /// <summary>
+    /// This method updates the idle behavior of the AI.
+    /// </summary>
     private void UpdateIdle()
     {
         // If we can see the player, start chasing.
@@ -256,7 +274,7 @@ public class AIBigEnemy : MonoBehaviour
 
                 //Offset the projectile spawn position slightly to avoid overlap
                 Vector3 _spawnPosition = _shootMechanic.ShootPoint.position;
-                _spawnPosition.y += Random.Range(- 2.5f, 2.5f);
+                _spawnPosition.y += Random.Range(- 2.1f, 2.1f);
 
                 // Instantiate and initialize projectile
                 GameObject _projectile = Instantiate(_combustProjectilePrefab, _spawnPosition, Quaternion.identity);
@@ -283,10 +301,32 @@ public class AIBigEnemy : MonoBehaviour
     /// <param name="damage"></param>
     public void TakeDamage(int damage)
     {
+        // Reduce health
         _Health -= damage;
+
+        //set up healthbar
+        if (_healthbar != null)
+        {
+            _healthbar.SetHealth(_Health);
+        }
+
+        // Check for death
         if (_Health <= 0)
         {
             Destroy(this.gameObject);
         }
     }
+
+    /// <summary>
+    /// if the big enemy walks into breakable object, destroy it
+    /// </summary>
+    /// <param name="other"></param>
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Breakable"))
+        {
+            Destroy(other.gameObject);
+        }
+    }
+
 }

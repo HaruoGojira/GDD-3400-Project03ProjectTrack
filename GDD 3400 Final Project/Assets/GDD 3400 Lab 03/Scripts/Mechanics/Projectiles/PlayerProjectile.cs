@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Projectile : MonoBehaviour
+public class PlayerProjectile : MonoBehaviour
     {
     [SerializeField] float _Speed = 10f;
     [SerializeField] float _InitialColliderDelay = 0.2f; // This is the delay before the collider is enabled
@@ -37,18 +37,11 @@ public class Projectile : MonoBehaviour
         _parentTag = parentTag;
     }
 
-    /// <summary>
-    /// This method enables the collider
-    /// </summary>
     void EnableCollider()
     {
         _Collider.enabled = true;
     }
 
-    /// <summary>
-    /// is called when the collider enters a trigger
-    /// </summary>
-    /// <param name="other"></param>
     void OnTriggerEnter(Collider other)
     {
         // If the projectile hits the parent, don't do anything
@@ -65,53 +58,25 @@ public class Projectile : MonoBehaviour
             impactParticles.Play();
         }
 
-        // Try to get the components of the enemies
-        AIBigEnemy _bigEnemy = other.GetComponentInParent<AIBigEnemy>();
+        // Try to get the AIBigEnemy component
+        AIBigEnemy enemy = other.GetComponentInParent<AIBigEnemy>();
         AISmallEnemy smallEnemy = other.GetComponentInParent<AISmallEnemy>();
-
-        // If an enemy component is found, apply damage
-        if (_bigEnemy != null)
+        if (enemy != null)
         {
-            _bigEnemy.TakeDamage(_Damage);
+            enemy.TakeDamage(_Damage);
         }
         else if (smallEnemy != null)
         {
             smallEnemy.TakeDamage(_Damage);
         }
 
-        //get component for player
-        else if (other.GetComponentInParent<PlayerController>() != null)
-        {
-            PlayerController _player = other.GetComponentInParent<PlayerController>();
-            _player.TakeDamage(_Damage);
-        }
 
         if (_ApplyExplosionForce) Explode(this.transform.position);
-
-        // If the projectile can destroy breakables
-        if (other.gameObject.CompareTag("Breakable"))
-        {
-            // Send a message to break the object
-            other.gameObject.SendMessageUpwards("BreakObject", SendMessageOptions.DontRequireReceiver);
-            // Destroys the object with the "Breakable" tag
-            Destroy(other.gameObject);
-
-            // if the player shoots a breakable, we don't want the Breakable object to break
-            if (_parentTag == "Player")
-            {
-                return;
-            }
-
-        }
 
         // Destroy the projectile
         DestroyProjectile();
     }
 
-    /// <summary>
-    /// This method applies explosion force to nearby rigidbodies
-    /// </summary>
-    /// <param name="explosionPosition"></param>
     public void Explode(Vector3 explosionPosition)
     {
         // Find nearby colliders

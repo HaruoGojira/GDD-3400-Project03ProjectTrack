@@ -34,7 +34,6 @@ public class ShootMechanic : MonoBehaviour
 
     Coroutine _ShootCooldown;
 
-
     // Initialize the animator and the gizmos color
     public void Awake()
     {

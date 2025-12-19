@@ -13,7 +13,9 @@ public class AISmallEnemy : MonoBehaviour
     }
 
     [Header("Health")]
-    [SerializeField] int _Health = 100;
+    [SerializeField] int _Health = 20;
+    [SerializeField] private Healthbar _healthbar;
+    private int _maxHealth;
 
     [Header("Navigation")]
     [SerializeField] float _ReNavigateInterval = 1f;
@@ -70,6 +72,13 @@ public class AISmallEnemy : MonoBehaviour
         _navigation = this.GetComponent<AINavigation>();
         _shootMechanic = this.GetComponent<ShootMechanic>();
         _perception = this.GetComponent<AIPerception>();
+
+        // Initialize healthbar
+        if (_healthbar != null)
+        {
+            _maxHealth = _Health;
+            _healthbar.Initialize(_maxHealth);
+        }
 
         // Start the agent in the idle state
         SwitchState(AIState.Idle);
@@ -352,7 +361,6 @@ public class AISmallEnemy : MonoBehaviour
 
     }
 
-
     #endregion
 
     private void PickNewPatrolPoint()
@@ -368,9 +376,21 @@ public class AISmallEnemy : MonoBehaviour
         _navigation.SetDestination(_currentPatrolPoint.position);
     }
 
+    /// <summary>
+    /// takes damage from projectiles
+    /// </summary>
+    /// <param name="damage"></param>
     public void TakeDamage(int damage)
     {
+        // Reduce health by damage amount
         _Health -= damage;
+
+        // set healthbar
+        if (_healthbar != null)
+        {
+            _healthbar.SetHealth(_Health);
+        }
+
         if (_Health <= 0)
         {
             Destroy(this.gameObject);

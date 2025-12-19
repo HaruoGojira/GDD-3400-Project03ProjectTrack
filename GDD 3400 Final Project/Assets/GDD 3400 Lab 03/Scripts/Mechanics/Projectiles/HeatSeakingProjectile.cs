@@ -71,7 +71,7 @@ public class HeatSeakingProjectile : MonoBehaviour
         // If there is a target, rotate towards it
         if (_target != null)
         {
-            Debug.Log("HEat Seaking", _target.gameObject);
+            Debug.Log("Heat Seaking", _target.gameObject);
             // Calculate the direction to the target
             Vector3 directionToTarget = ((_target.position + Vector3.up) - this.transform.position).normalized;
             transform.forward = directionToTarget;
