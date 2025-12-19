@@ -37,6 +37,7 @@ public class PlayerProjectile : MonoBehaviour
         _parentTag = parentTag;
     }
 
+    // This method enables the collider
     void EnableCollider()
     {
         _Collider.enabled = true;
@@ -58,12 +59,12 @@ public class PlayerProjectile : MonoBehaviour
             impactParticles.Play();
         }
 
-        // Try to get the AIBigEnemy component
-        AIBigEnemy enemy = other.GetComponentInParent<AIBigEnemy>();
+        // Try to get the enemy components
+        AIBigEnemy _bigEnemy = other.GetComponentInParent<AIBigEnemy>();
         AISmallEnemy smallEnemy = other.GetComponentInParent<AISmallEnemy>();
-        if (enemy != null)
+        if (_bigEnemy != null)
         {
-            enemy.TakeDamage(_Damage);
+            _bigEnemy.TakeDamage(_Damage);
         }
         else if (smallEnemy != null)
         {

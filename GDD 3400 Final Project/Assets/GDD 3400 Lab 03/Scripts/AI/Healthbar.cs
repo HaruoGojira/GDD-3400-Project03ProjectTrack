@@ -16,6 +16,7 @@ public class Healthbar : MonoBehaviour
     // set the healthbar to reflect current health
     public void SetHealth(int currentHealth)
     {
+        // calculate health percentage and update the healthbar fill amount
         float healthPercentage = (float)currentHealth / _maxHealth;
         _healthbarSprite.fillAmount = healthPercentage;
     }

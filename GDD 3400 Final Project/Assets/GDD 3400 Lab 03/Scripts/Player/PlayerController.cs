@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("Health")]
     [SerializeField] private int _PlayerHealth = 100;
-    [SerializeField] private float _invincibilityTime = 1f;
+    [SerializeField] private float _invincibilityTime = .5f;
     [SerializeField] private Healthbar _healthbar;
     private int _maxHealth;
 

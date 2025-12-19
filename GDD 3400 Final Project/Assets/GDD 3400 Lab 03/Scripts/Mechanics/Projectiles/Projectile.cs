@@ -65,6 +65,7 @@ public class Projectile : MonoBehaviour
             impactParticles.Play();
         }
 
+        // getting components to help with health/damage and healthbars
         // Try to get the components of the enemies
         AIBigEnemy _bigEnemy = other.GetComponentInParent<AIBigEnemy>();
         AISmallEnemy smallEnemy = other.GetComponentInParent<AISmallEnemy>();

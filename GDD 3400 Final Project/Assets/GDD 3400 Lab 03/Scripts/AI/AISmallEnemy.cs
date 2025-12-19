@@ -3,6 +3,7 @@ using UnityEngine.AI;
 
 public class AISmallEnemy : MonoBehaviour
 {
+    // Possible states for the AI agent
     public enum AIState
     {
         Idle,
@@ -127,6 +128,10 @@ public class AISmallEnemy : MonoBehaviour
 
     #region State Updates
 
+    /// <summary>
+    /// Switches the AI to a new state
+    /// </summary>
+    /// <param name="newState"></param>
     private void SwitchState(AIState newState)
     {
 
@@ -194,6 +199,9 @@ public class AISmallEnemy : MonoBehaviour
     #endregion
 
     #region State Updates
+    /// <summary>
+    /// then enemy is in idle state
+    /// </summary>
     private void UpdateIdle()
     {
         // If we can see the player, start chasing.
@@ -209,6 +217,9 @@ public class AISmallEnemy : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// enemy is in patrol state
+    /// </summary>
     private void UpdatePatrol()
     {
         // If we see the player at any time, start chasing.
@@ -305,6 +316,9 @@ public class AISmallEnemy : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// then enemy is in search state
+    /// </summary>
     private void UpdateSearch()
     {
         // If we have been searching for too long, go back to patrol.

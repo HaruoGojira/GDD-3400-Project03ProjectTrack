@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.AI;
 
 public class AIBigEnemy : MonoBehaviour
 {
@@ -89,7 +90,7 @@ public class AIBigEnemy : MonoBehaviour
         // Update the state timer
         _stateTimer += Time.deltaTime;
 
-        // Update the attack timer
+        // Update the attack timers
         _bossAttackTimer += Time.deltaTime;
         _heatSeakingAttackTimer += Time.deltaTime;
         _combustAttackTimer += Time.deltaTime;
@@ -274,7 +275,7 @@ public class AIBigEnemy : MonoBehaviour
 
                 //Offset the projectile spawn position slightly to avoid overlap
                 Vector3 _spawnPosition = _shootMechanic.ShootPoint.position;
-                _spawnPosition.y += Random.Range(- 2.1f, 2.1f);
+                _spawnPosition.y += Random.Range(- 2f, 2f);
 
                 // Instantiate and initialize projectile
                 GameObject _projectile = Instantiate(_combustProjectilePrefab, _spawnPosition, Quaternion.identity);
@@ -314,6 +315,9 @@ public class AIBigEnemy : MonoBehaviour
         if (_Health <= 0)
         {
             Destroy(this.gameObject);
+
+            // print message that big enemy is defeated
+            Debug.Log("Big Enemy Defeated! Congratulations!");
         }
     }
 
